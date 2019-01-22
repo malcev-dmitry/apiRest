@@ -55,7 +55,6 @@ const router = app => {
             select = `${select + key} = "${response.req.body[key]}", `;
         }
         select = select.slice(0, select.length - 2);
-        console.log(select);
         pool.query('INSERT INTO bookmarks SET '+ select, (error, result) => {
             if (error) throw error;
 
