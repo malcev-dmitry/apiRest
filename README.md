@@ -1,5 +1,7 @@
 # Node.js Express REST API
 
+# За основу брался: https://github.com/taniarascia/node-api
+
 ## Create Database
 
 Make sure MySQL is installed and running on the system. Create a `api` table and run the query:
