@@ -1,6 +1,7 @@
 # Node.js Express REST API
 
-# За основу брался: https://github.com/taniarascia/node-api
+# За основу брался: 
+https://github.com/taniarascia/node-api
 
 ## Create Database
 
