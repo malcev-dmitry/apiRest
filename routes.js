@@ -24,14 +24,39 @@ const router = app => {
 
         pool.query('SELECT * FROM bookmarks WHERE id = ?', id, (error, result) => {
             if (error) throw error;
+            response.send(result);
+        });
+    });
 
+    // Узнать количество строк в таблице для пагинации
+    app.get('/count', (request, response) => {
+        pool.query('SELECT COUNT(*) AS rowsCount FROM bookmarks', (error, result) => {
+            if (error) throw error;
+            response.send(result);
+        });
+    });
+
+    // Получить строки из бд с позиции id в колличестве limit
+    app.get('/interval/:id/:limit', (request, response) => {
+        const id = request.params.id;
+        const limit = request.params.limit;
+        pool.query('SELECT * FROM bookmarks ORDER BY id LIMIT ' + id + ', ' + limit, (error, result) => {
+            if (error) throw error;
             response.send(result);
         });
     });
 
     // Add a new user
-    app.post('/bookmarks', (request, response) => {
-        pool.query('INSERT INTO bookmarks SET ?', request.body, (error, result) => {
+    app.post('/bookmarks/add', (request, response) => {
+        let select = '';
+        for (key in response.req.body) {
+            if (key === 'date_bookmark')
+                response.req.body[key] = response.req.body[key].slice(0, 10);
+            select = `${select + key} = "${response.req.body[key]}", `;
+        }
+        select = select.slice(0, select.length - 2);
+        console.log(select);
+        pool.query('INSERT INTO bookmarks SET '+ select, (error, result) => {
             if (error) throw error;
 
             response.status(201).send(`Bookmark added with ID: ${result.insertId}`);
@@ -39,7 +64,7 @@ const router = app => {
     });
 
     // Update an existing user
-    app.put('/bookmarks/:id', (request, response) => {
+    app.put('/bookmarks/update/:id', (request, response) => {
         const id = request.params.id;
 
         pool.query('UPDATE bookmarks SET ? WHERE id = ?', [request.body, id], (error, result) => {
@@ -50,7 +75,7 @@ const router = app => {
     });
 
     // Delete a user
-    app.delete('/bookmarks/:id', (request, response) => {
+    app.delete('/bookmarks/del/:id', (request, response) => {
         const id = request.params.id;
 
         pool.query('DELETE FROM bookmarks WHERE id = ?', id, (error, result) => {
