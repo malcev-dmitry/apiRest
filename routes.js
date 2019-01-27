@@ -50,8 +50,9 @@ const router = app => {
     app.post('/bookmarks/add', (request, response) => {
         let select = '';
         for (key in response.req.body) {
-            if (key === 'date_bookmark')
+            if (key === 'date_bookmark') {
                 response.req.body[key] = response.req.body[key].slice(0, 10);
+            }
             select = `${select + key} = "${response.req.body[key]}", `;
         }
         select = select.slice(0, select.length - 2);
@@ -59,6 +60,15 @@ const router = app => {
             if (error) throw error;
 
             response.status(201).send(`Bookmark added with ID: ${result.insertId}`);
+        });
+    });
+
+    // Delete a user
+    app.post('/del', (request, response) => {
+        const ids = response.req.body;
+        pool.query('DELETE FROM bookmarks WHERE id IN(' + ids + ')', (error, result) => {
+            if (error) throw error;
+            response.send('bookmark deleted.');
         });
     });
 
@@ -70,16 +80,6 @@ const router = app => {
             if (error) throw error;
 
             response.send('bookmark updated successfully.');
-        });
-    });
-
-    // Delete a user
-    app.delete('/bookmarks/del/:id', (request, response) => {
-        const id = request.params.id;
-
-        pool.query('DELETE FROM bookmarks WHERE id = ?', id, (error, result) => {
-            if (error) throw error;
-            response.send('bookmark deleted.');
         });
     });
 };
