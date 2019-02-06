@@ -73,10 +73,21 @@ const router = app => {
     });
 
     // Update an existing user
-    app.put('/bookmarks/update/:id', (request, response) => {
+    app.post('/bookmarks/update/:id', (request, response) => {
         const id = request.params.id;
+        console.log(id, ' ', response.req.body);
 
-        pool.query('UPDATE bookmarks SET ? WHERE id = ?', [request.body, id], (error, result) => {
+        let select = '';
+        for (key in response.req.body) {
+            if (key === 'date_bookmark') {
+                response.req.body[key] = response.req.body[key].slice(0, 10);
+            }
+            select = `${select + key} = "${response.req.body[key]}", `;
+        }
+        select = select.slice(0, select.length - 2);
+
+
+        pool.query('UPDATE bookmarks SET ' + select + ' WHERE id = ' + id, (error, result) => {
             if (error) throw error;
 
             response.send('bookmark updated successfully.');
